@@ -4,8 +4,11 @@
   "description": "Sentinelle Numerique - Spécialité: Fact-Checker Automatisé",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "test": "jest --forceExit",
+  "dev:gateway": "nodemon src/gateway/index.js",
+  "dev:engine": "nodemon src/engine/analysis.engine.js",
+  "dev": "concurrently \"npm run dev:gateway\" \"npm run dev:engine\""
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/duval7/Sentinelle-Numerique-Projet4.git"
