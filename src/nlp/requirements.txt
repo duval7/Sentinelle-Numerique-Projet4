@@ -1,0 +1,10 @@
+# requirements.txt — NLP Module Dependencies
+# Sentinelle Numérique | Groupe 4 | FAVOUR Noella
+#
+# HOW TO INSTALL:
+#   pip install -r requirements.txt
+#   python -m spacy download en_core_web_sm
+
+spacy>=3.7.0
+pytest>=8.0.0
+requests>=2.31.0
