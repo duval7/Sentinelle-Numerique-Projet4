@@ -2,11 +2,12 @@
 const express        = require("express");
 const Joi            = require("joi");
 const { v4: uuidv4 } = require("uuid");
+const axios          = require("axios");
 const bus            = require("../engine/bus.client");
 
-const router = express.Router();
+const router     = express.Router();
+const REPORT_URL = `http://localhost:${process.env.PORT_REPORT || 3002}`;
 
-// Validation: user must send either a URL or a text (minimum 50 characters)
 const schema = Joi.object({
   url:  Joi.string().uri().optional(),
   text: Joi.string().min(50).max(10000).optional(),
@@ -36,6 +37,7 @@ router.post("/analyze", async (req, res, next) => {
       jobId,
       message: "Analysis started. Poll /api/result/:id to get the result.",
     });
+
   } catch (err) {
     next(err);
   }
@@ -44,13 +46,20 @@ router.post("/analyze", async (req, res, next) => {
 // GET /api/result/:id
 router.get("/result/:id", async (req, res, next) => {
   try {
-    // TODO Sprint 3: query MongoDB for the report with this jobId
-    res.json({
-      jobId:   req.params.id,
-      status:  "pending",
-      message: "Result store coming in Sprint 3.",
-    });
+    const response = await axios.get(
+      `${REPORT_URL}/report/${req.params.id}`,
+      { timeout: 5000 }
+    );
+    res.json(response.data);
   } catch (err) {
+    // Report not found yet — still processing
+    if (err.response?.status === 404) {
+      return res.json({
+        jobId:   req.params.id,
+        status:  "pending",
+        message: "Analysis in progress. Try again in a few seconds.",
+      });
+    }
     next(err);
   }
 });
